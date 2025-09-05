@@ -1,0 +1,26 @@
+# --- Configuration ---
+# modify these settings as needed
+# ser2net TCP connection settings
+# IMPORTANT: Change this to the IP address of the machine running ser2net
+REMOTE_HOST = "192.168.1.1" # Or whatever the IP of your ser2net server is, for my case it's the IP of my openwrt
+REMOTE_PORT = 5000
+
+# Home Assistant settings
+HA_URL = "http://homeassistant.local:8123"
+
+# IMPORTANT: Replace "YOUR_LONG_LIVED_ACCESS_TOKEN" with your actual Home Assistant token
+TOKEN = "YOUR_LONG_LIVED_ACCESS_TOKEN"
+HEADERS = {"Authorization": f"Bearer {TOKEN}", "content-type": "application/json"}
+
+# Home Assistant entity ID to create/update
+ZONE_ENTITY_ID = "zone.rv"
+DEVICE_TRACKER_ENTITY_ID = "device_tracker.rv_gps"
+
+
+# --- Filtering and Throttling ---
+MIN_UPDATE_INTERVAL_SECONDS = 10
+MAX_UPDATE_INTERVAL_SECONDS = 300  # Force update after 5 minutes regardless of other conditions
+MIN_DISTANCE_METERS = 20
+MAX_SPEED_MPS = 1000  # Approx 3600 km/h, a sanity check
+MIN_RADIUS_METERS = 100
+MAX_RADIUS_METERS = 500
