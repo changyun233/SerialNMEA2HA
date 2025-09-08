@@ -50,6 +50,10 @@ def calculate_distance(lat1, lon1, lat2, lon2):
 
 def calculate_dynamic_radius(speed_kmh, pdop):
     radius = MIN_RADIUS_METERS
+    try:
+        pdop = int(float(pdop)) if pdop and str(pdop).strip() else 99
+    except (ValueError, TypeError):
+        pdop = 99  # Default to worst case PDOP if conversion fails
     if pdop > 6: radius += 200
     elif pdop > 4: radius += 100
     elif pdop > 2: radius += 50
