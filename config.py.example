@@ -24,3 +24,8 @@ MIN_DISTANCE_METERS = 20
 MAX_SPEED_MPS = 1000  # Approx 3600 km/h, a sanity check
 MIN_RADIUS_METERS = 100
 MAX_RADIUS_METERS = 500
+
+# Enable or disable Kalman filtering of GPS coordinates
+# Set to False to use raw GPS coordinates without smoothing
+# Recommend false if you would like to trace a moving vehicle
+KALMAN_ENABLED = False

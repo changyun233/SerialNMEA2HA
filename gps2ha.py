@@ -105,7 +105,7 @@ def post_device_tracker_update(data):
         return False
 
 def main():
-    kf = KalmanFilter(process_variance=0.01, measurement_variance=10)
+    kf = KalmanFilter(process_variance=0.01, measurement_variance=10) if 'KALMAN_ENABLED' in globals() and KALMAN_ENABLED else None
     latest_pdop, latest_sat_count, latest_altitude = 99.0, 0, 0.0
     last_filter_time = time.time()
     
@@ -113,6 +113,7 @@ def main():
     last_forced_update_time = time.time()
 
     print("Starting GPS to Home Assistant service...")
+    print(f"Kalman filter enabled: {bool('KALMAN_ENABLED' in globals() and KALMAN_ENABLED)}")
     while True:
         try:
             print(f"Connecting to ser2net at {REMOTE_HOST}:{REMOTE_PORT}...")
@@ -157,16 +158,20 @@ def main():
                             last_check_time = current_time
 
                             raw_coords = np.array([parsed_data.lat, parsed_data.lon])
-                            if not kf.initialized:
-                                kf.initialize(raw_coords)
+                            if kf is not None:
+                                if not kf.initialized:
+                                    kf.initialize(raw_coords)
+                                    last_filter_time = current_time
+                                    last_forced_update_time = current_time
+                                    continue
+                            
+                                dt = current_time - last_filter_time
                                 last_filter_time = current_time
-                                last_forced_update_time = current_time
-                                continue
-                        
-                            dt = current_time - last_filter_time
-                            last_filter_time = current_time
-                            kf.predict(dt)
-                            smoothed_lat, smoothed_lon = kf.update(raw_coords)
+                                kf.predict(dt)
+                                smoothed_lat, smoothed_lon = kf.update(raw_coords)
+                            else:
+                                # Kalman filter disabled; use raw coordinates
+                                smoothed_lat, smoothed_lon = raw_coords[0], raw_coords[1]
 
                             previous_state = get_previous_state(DEVICE_TRACKER_ENTITY_ID)
                             
